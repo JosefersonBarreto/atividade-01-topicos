@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(reticulate)
 knitr::opts_chunk$set(echo = TRUE)
-
+py_install('matplotlib')
 
 ```
 
@@ -31,11 +31,7 @@ df = pd.read_csv('steam.csv')
 
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{python}
 df.head()
@@ -151,6 +147,13 @@ top_6_owners = df[
           
 
 ```
+
+
+
+
+
+
+
 ```{python}
 print(top_6_owners)
           
@@ -205,11 +208,106 @@ fig = px.bar(df, x=['No-multiplayer','Multiplayer'], y= valor, title="Wide-Form 
 fig.show()
 ```
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+
+# fazendo utilizando a linguagem R
+
+
+```{r pressure, echo=FALSE,warning=FALSE}
+library('dplyr')
+#install.packages("plotly")
+library('ggplot2')
+library(tidyr)
+library('plotly')
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# carregando o banco de dados para a linguagem R
 
+```{R}
+dados <-read.csv("steam.csv")
+```
+
+
+
+
+
+
+
+
+
+verificando se temos valores ausentes 
+
+```{R}
+
+any(is.na(dados))
+
+```
+
+como o vaalor retornado foi null  não temos dados faltantes 
+
+
+```{R}
+
+
+glimpse(dados)
+```
+
+```{r,warning=FALSE}
+
+#install.packages("psych")
+library(psych)
+describe(dados) 
+
+```
+
+
+
+
+```{r}
+
+
+library("gt")
+
+dados %>% gt()
+
+```
+
+aparentimente a coluna a appid é apenas um identificador(id),não vamos utiliza-lá
+
+
+
+```{r}
+dados<-dados[-1]
+
+```
+
+
+```{r}
+
+table(dados$english)
+```
+asumandindo  0 como não ingles e 1 como ingles temos :
+
+
+```{r}
+library(plotly)
+
+USPersonalExpenditure <- data.frame("Categorie"=rownames(USPersonalExpenditure), USPersonalExpenditure)
+categoria<-c("no inglesh","inglesh")
+
+dados$inglesf<-factor(c(dados$english), levels = c("0","1"))
+
+p <- dados %>%
+  group_by(english) %>%
+  summarize(count = n()) %>%
+  plot_ly(labels = ~english, values = ~count) %>%
+  add_pie(hole = 0) %>%
+  layout(title = "Jogos com idioma ingles",  showlegend = F,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE))
+p
+
+```
 
 
