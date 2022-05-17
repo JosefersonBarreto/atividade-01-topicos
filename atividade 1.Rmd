@@ -1,0 +1,215 @@
+---
+title: "atividade1 -topicos"
+author: "Joseferson Da Silva Barreto"
+date: '2022-05-17'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(reticulate)
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib
+import seaborn as sns
+import pandas as pd
+
+import plotly
+import plotly.graph_objects as go
+import plotly.express as px
+
+from plotly.offline import plot, iplot, init_notebook_mode
+
+
+df = pd.read_csv('steam.csv')
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{python}
+df.head()
+
+```
+
+
+
+```{python}
+df['appid'].sample()
+
+```
+
+
+
+```{python}
+df.isnull().sum()
+```
+
+
+```{python}
+df['appid'].sample()
+
+``` 
+
+
+```{python}
+df.drop(columns='appid', inplace=True)
+
+```
+
+
+
+
+
+```{python}
+df['english'].unique() 
+
+```
+
+```{python}
+df['english'].unique() 
+
+```
+
+
+
+
+```{python}
+map_dict = {0: 'non-English', 1: 'English'}
+
+df['english'] = df['english'].map(map_dict)
+
+```
+
+
+
+```{Python}
+fig = go.Figure(data=[go.Pie(labels=df['english'].value_counts().index, 
+                             values=df['english'].value_counts().values)])
+
+fig.update_traces(textinfo='value', textfont_size=20,
+                  marker=dict(colors=['salmon', 'lightblue'], 
+                  line=dict(color='#000000', width=2)))
+
+fig.update_layout(
+    height=600, width=600, title_text='English and not English pie chart',
+    xaxis_title='number of songs', yaxis_title='artist', title_x = 0.5,
+    
+    font=dict(
+            family="Courier New, monospace",
+            size=18,
+            color="black"),
+    
+    legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.2,
+            xanchor="right",
+            x=1)
+)
+
+fig.show()
+```
+
+
+```{python}
+import plotly.express as px
+#df = px.data.tips()
+fig = px.pie(df, values=df['english'].value_counts().values, names=df['english'].value_counts().index,
+title='Jogos com idioma ingles',
+color_discrete_map={'Thur':'lightcyan'})
+fig.update_traces( textinfo='percent+label')
+#fig.show()
+```
+temos que  98.1% dos games possui idioma ingles e apenas  1,89% nao possui este idioma
+
+# verificar a quantidade de proprietarios 
+```{python}
+
+
+df['owners'].value_counts().tail()
+```
+apenas 1 dos jogos possuem mais de cem milhões de proprietários(jogadores)
+
+
+```{python}
+top_6_owners = df[
+            (df['owners'] == '20000000-50000000') | 
+            (df['owners'] == '50000000-100000000') | 
+            (df['owners'] == '100000000-200000000')
+          ].sort_values(by='owners')
+          
+
+```
+```{python}
+print(top_6_owners)
+          
+```
+
+perceba que dota 2 é o jogo mais adquirido ou jogado na steam, um dos motivos pode ser seu preço(gratís).
+
+
+
+
+
+
+
+```{python}
+df['release_date'] = pd.to_datetime(df['release_date'])
+df['release_date'].head()
+
+```
+
+
+# vamos verificar a quantiddade de jogos grátis 
+```{python}
+
+free, not_free = df[df['price'] == 0].shape[0], df[df['price'] != 0].shape[0]
+
+labels = ['free', 'not free']
+
+fig = px.pie(df, values=[free, not_free], names=labels,
+title='relação de jogos gratuitos',
+color_discrete_map={'Thur':'lightcyan'})
+fig.update_traces( textinfo='percent+label')
+
+          
+```
+
+apenas 9,46% dos games disponíveis são gratuitos 
+
+## Vamos ver quantos jogos no Steam oferecem jogabilidade multiplayer e quantos jogos não oferecem esse recurso
+
+
+```{python}
+import plotly.express as px
+
+df['multiplayer'] = df['categories'].apply(lambda x: 'multi-player' in x.lower())
+df.drop(columns='categories')
+
+valor=df['multiplayer'].value_counts().values
+
+
+
+fig = px.bar(df, x=['No-multiplayer','Multiplayer'], y= valor, title="Wide-Form Input")
+fig.show()
+```
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
